@@ -42,10 +42,10 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
+                .requestMatchers("/", "/error", "/actuator/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/services/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // Owner endpoints
