@@ -114,7 +114,7 @@ export default function MyOrders() {
               return (
                 <div
                   key={order.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 hover:border-slate-300 shadow-xs transition-colors"
+                  className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 space-y-4 hover:border-sky-300 shadow-xs hover:shadow-md transition-all"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">

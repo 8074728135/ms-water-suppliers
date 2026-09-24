@@ -466,13 +466,13 @@ export default function DriverDashboard() {
               {activeDeliveries.slice(1).map((del) => (
                 <div
                   key={del.deliveryId}
-                  className="bg-white border border-slate-200 rounded-xl p-3.5 flex items-center justify-between shadow-xs"
+                  className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 flex items-center justify-between shadow-xs hover:border-sky-300 transition-all"
                 >
-                  <div>
-                    <div className="text-xs font-bold text-slate-900">
+                  <div className="space-y-1">
+                    <div className="text-sm font-bold text-slate-900">
                       {del.customerName}
                     </div>
-                    <div className="text-[11px] text-slate-500 truncate max-w-[200px]">
+                    <div className="text-xs text-slate-500 truncate max-w-[260px] sm:max-w-md">
                       {del.address}
                     </div>
                   </div>

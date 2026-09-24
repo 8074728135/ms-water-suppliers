@@ -219,13 +219,13 @@ export default function CustomerHome() {
           </div>
 
           {loading ? (
-            <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-500 text-xs">
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-10 text-center text-slate-500 text-sm shadow-xs">
               Loading orders...
             </div>
           ) : pastOrders.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-xl p-8 text-center space-y-2 shadow-xs">
-              <div className="text-sm font-bold text-slate-800">No past deliveries</div>
-              <p className="text-xs text-slate-500">
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-10 text-center space-y-2 shadow-xs">
+              <div className="text-base font-bold text-slate-800">No past deliveries</div>
+              <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
                 Book your first water tanker or drum delivery above!
               </p>
             </div>

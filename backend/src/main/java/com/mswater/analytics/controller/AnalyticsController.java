@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/analytics")
+@RequestMapping({"/api/admin/analytics", "/api/admin/dashboard"})
 @PreAuthorize("hasRole('OWNER')")
 @RequiredArgsConstructor
 public class AnalyticsController {
@@ -23,7 +23,7 @@ public class AnalyticsController {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
 
-    @GetMapping("/dashboard")
+    @GetMapping({"/dashboard", "/stats", ""})
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDashboardStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 

@@ -208,7 +208,7 @@ public class DriverDeliveryController {
         return ResponseEntity.ok(ApiResponse.success("Availability updated to " + status));
     }
 
-    @GetMapping("/duty-status")
+    @GetMapping({"/duty-status", "/duty"})
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDutyStatus(@AuthenticationPrincipal User user) {
         Driver driver = driverRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Driver", "userId", user.getId()));
@@ -274,7 +274,7 @@ public class DriverDeliveryController {
         )));
     }
 
-    @PostMapping("/resume-duty")
+    @RequestMapping(value = {"/resume-duty", "/duty/resume"}, method = {RequestMethod.POST, RequestMethod.PUT})
     @Transactional
     public ResponseEntity<ApiResponse<String>> resumeDuty(@AuthenticationPrincipal User user) {
         Driver driver = driverRepository.findByUserId(user.getId())

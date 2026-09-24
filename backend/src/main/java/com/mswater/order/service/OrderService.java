@@ -183,12 +183,15 @@ public class OrderService {
             lat = address.getLatitude();
             lng = address.getLongitude();
         } else {
-            // Fallback to customer's default address if available
             var defaultAddr = addressRepository.findByCustomerIdOrderByIsDefaultDescCreatedAtAsc(customer.getId());
             if (!defaultAddr.isEmpty()) {
                 deliveryAddress = buildAddressString(defaultAddr.get(0));
                 lat = defaultAddr.get(0).getLatitude();
                 lng = defaultAddr.get(0).getLongitude();
+            } else if (request.getInstructions() != null && request.getInstructions().contains("Address: ")) {
+                deliveryAddress = request.getInstructions().substring(request.getInstructions().indexOf("Address: ") + 9).trim();
+            } else {
+                deliveryAddress = "Hindupur, Andhra Pradesh";
             }
         }
 
