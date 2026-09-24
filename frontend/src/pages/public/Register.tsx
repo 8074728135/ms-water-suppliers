@@ -42,7 +42,10 @@ export default function Register() {
         navigate('/customer');
       }
     } catch (error: any) {
-      const msg = error.response?.data?.message || 'Registration failed. Please try again.';
+      const msg = error.response?.data?.message 
+        || (error.message === 'Network Error' 
+            ? 'Unable to connect to water backend server. Please verify backend is running or retry in a moment.' 
+            : 'Registration failed. Please try again.');
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -86,16 +89,19 @@ export default function Register() {
                 Full Name
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600">
-                  <User className="w-4 h-4" />
-                </div>
+                {!name && (
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
+                    <User className="w-4 h-4" />
+                  </div>
+                )}
                 <input
                   id="register-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Ramesh Reddy"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                  style={{ paddingLeft: !name ? '2.5rem' : '1rem' }}
+                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   required
                 />
               </div>
@@ -106,9 +112,11 @@ export default function Register() {
                 Mobile Number
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600">
-                  <Phone className="w-4 h-4" />
-                </div>
+                {!mobile && (
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                )}
                 <input
                   id="register-mobile"
                   type="tel"
@@ -116,7 +124,8 @@ export default function Register() {
                   onChange={(e) => setMobile(e.target.value)}
                   placeholder="10-digit mobile number"
                   maxLength={10}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
+                  style={{ paddingLeft: !mobile ? '2.5rem' : '1rem' }}
+                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
                   required
                 />
               </div>
@@ -127,16 +136,19 @@ export default function Register() {
                 Create Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600">
-                  <Lock className="w-4 h-4" />
-                </div>
+                {!password && (
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                )}
                 <input
                   id="register-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                  style={{ paddingLeft: !password ? '2.5rem' : '1rem' }}
+                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   required
                 />
               </div>
@@ -147,16 +159,19 @@ export default function Register() {
                 Confirm Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600">
-                  <Lock className="w-4 h-4" />
-                </div>
+                {!confirmPassword && (
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                )}
                 <input
                   id="register-confirm"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                  style={{ paddingLeft: !confirmPassword ? '2.5rem' : '1rem' }}
+                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   required
                 />
               </div>

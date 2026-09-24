@@ -93,9 +93,11 @@ export default function Login() {
                 Mobile Number
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600">
-                  <Phone className="w-4 h-4" />
-                </div>
+                {!mobile && (
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                )}
                 <input
                   id="login-mobile"
                   type="tel"
@@ -103,7 +105,8 @@ export default function Login() {
                   onChange={(e) => setMobile(e.target.value)}
                   placeholder="Enter 10-digit mobile number"
                   maxLength={10}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
+                  style={{ paddingLeft: !mobile ? '2.5rem' : '1rem' }}
+                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
                   required
                 />
               </div>
@@ -116,16 +119,19 @@ export default function Login() {
                 </label>
               </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600">
-                  <Lock className="w-4 h-4" />
-                </div>
+                {!password && (
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                )}
                 <input
                   id="login-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                  style={{ paddingLeft: !password ? '2.5rem' : '1rem' }}
+                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   required
                 />
               </div>
