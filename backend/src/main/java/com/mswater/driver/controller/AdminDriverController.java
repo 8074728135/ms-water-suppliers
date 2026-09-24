@@ -89,6 +89,71 @@ public class AdminDriverController {
         return ResponseEntity.ok(ApiResponse.success(toMap(driver)));
     }
 
+    @PutMapping("/{id}/reset-password")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> resetDriverPassword(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Driver", "id", id));
+
+        String newPassword = body.get("password");
+        if (newPassword == null || newPassword.trim().length() < 4) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Password must be at least 4 characters"));
+        }
+
+        User user = driver.getUser();
+        user.setPasswordHash(passwordEncoder.encode(newPassword.trim()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(ApiResponse.success(Map.of(
+                "driverId", driver.getId(),
+                "driverName", user.getName(),
+                "message", "Driver password updated successfully by owner"
+        )));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateDriver(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Driver", "id", id));
+
+        User user = driver.getUser();
+        if (body.containsKey("name") && body.get("name") != null) {
+            user.setName(body.get("name").trim());
+        }
+        if (body.containsKey("mobile") && body.get("mobile") != null) {
+            String newMobile = body.get("mobile").trim();
+            if (!newMobile.equals(user.getMobile()) && userRepository.existsByMobile(newMobile)) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Mobile number already in use"));
+            }
+            user.setMobile(newMobile);
+        }
+        userRepository.save(user);
+
+        if (body.containsKey("licenseNumber")) {
+            driver.setLicenseNumber(body.get("licenseNumber"));
+        }
+        if (body.containsKey("status") && body.get("status") != null) {
+            driver.setStatus(body.get("status").toUpperCase());
+        }
+        driver = driverRepository.save(driver);
+
+        return ResponseEntity.ok(ApiResponse.success(toMap(driver)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteDriver(@PathVariable Long id) {
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Driver", "id", id));
+        driver.setStatus("INACTIVE");
+        driver.getUser().setIsActive(false);
+        userRepository.save(driver.getUser());
+        driverRepository.save(driver);
+        return ResponseEntity.ok(ApiResponse.success(Map.of("message", "Driver deactivated successfully")));
+    }
+
     private Map<String, Object> toMap(Driver driver) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", driver.getId());

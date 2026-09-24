@@ -1,8 +1,6 @@
 package com.mswater.auth.controller;
 
-import com.mswater.auth.dto.AuthResponse;
-import com.mswater.auth.dto.LoginRequest;
-import com.mswater.auth.dto.RegisterRequest;
+import com.mswater.auth.dto.*;
 import com.mswater.auth.service.AuthService;
 import com.mswater.common.response.ApiResponse;
 import com.mswater.user.entity.User;
@@ -40,6 +38,18 @@ public class AuthController {
         String refreshToken = request.get("refreshToken");
         AuthResponse response = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(ApiResponse.success("Token refreshed", response));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        Map<String, Object> response = authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Verification code sent", response));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        Map<String, Object> response = authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Password reset successfully", response));
     }
 
     @GetMapping("/me")

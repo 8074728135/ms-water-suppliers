@@ -13,4 +13,10 @@ export const authApi = {
 
   me: () =>
     api.get<ApiResponse<Record<string, unknown>>>('/api/auth/me'),
+
+  forgotPassword: (data: { identifier: string }) =>
+    api.post<ApiResponse<{ identifier: string; role: string; name: string; verificationCode?: string; message: string }>>('/api/auth/forgot-password', data),
+
+  resetPassword: (data: { identifier: string; otp: string; newPassword: string }) =>
+    api.post<ApiResponse<{ success: boolean; message: string; role: string }>>('/api/auth/reset-password', data),
 };

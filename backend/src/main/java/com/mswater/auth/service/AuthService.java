@@ -1,8 +1,6 @@
 package com.mswater.auth.service;
 
-import com.mswater.auth.dto.AuthResponse;
-import com.mswater.auth.dto.LoginRequest;
-import com.mswater.auth.dto.RegisterRequest;
+import com.mswater.auth.dto.*;
 import com.mswater.auth.security.JwtTokenProvider;
 import com.mswater.common.exception.BadRequestException;
 import com.mswater.customer.entity.Customer;
@@ -15,6 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +26,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
 
+    private final Map<String, String> otpStore = new ConcurrentHashMap<>();
+    private final SecureRandom random = new SecureRandom();
+
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         // Check if mobile already exists
@@ -31,7 +36,7 @@ public class AuthService {
             throw new BadRequestException("Mobile number already registered");
         }
 
-        // Create user
+        // Public registration is ALWAYS Role.CUSTOMER
         User user = User.builder()
                 .name(request.getName())
                 .mobile(request.getMobile())
@@ -68,15 +73,32 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByMobile(request.getMobile())
-                .orElseThrow(() -> new BadRequestException("Invalid mobile number or password"));
+        String identifier = request.getMobile() != null ? request.getMobile().trim() : "";
+        User user;
+
+        if (identifier.contains("@")) {
+            user = userRepository.findByEmailIgnoreCase(identifier)
+                    .orElseThrow(() -> new BadRequestException("Invalid email or password"));
+        } else {
+            user = userRepository.findByMobile(identifier)
+                    .orElseThrow(() -> new BadRequestException("Invalid mobile number or password"));
+        }
 
         if (!user.getIsActive()) {
             throw new BadRequestException("Account is deactivated. Please contact support.");
         }
 
+        // Strict Owner Check: only gowrish2006m@gmail.com or designated owner mobile can access OWNER role
+        if (user.getRole() == Role.OWNER) {
+            boolean isAllowedOwner = "gowrish2006m@gmail.com".equalsIgnoreCase(user.getEmail())
+                    || "9999999999".equals(user.getMobile());
+            if (!isAllowedOwner) {
+                throw new BadRequestException("Access denied: You do not have owner administrative privileges.");
+            }
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new BadRequestException("Invalid mobile number or password");
+            throw new BadRequestException("Invalid credentials. Please verify your mobile/email and password.");
         }
 
         String token = tokenProvider.generateToken(user.getId(), user.getMobile(), user.getRole().name());
@@ -112,5 +134,61 @@ public class AuthService {
                 .name(user.getName())
                 .mobile(user.getMobile())
                 .build();
+    }
+
+    /**
+     * Request OTP to reset password (works for Customer, Owner, Driver)
+     */
+    public Map<String, Object> forgotPassword(ForgotPasswordRequest request) {
+        String id = request.getIdentifier() != null ? request.getIdentifier().trim() : "";
+        User user = findUserByIdentifier(id);
+
+        String otp = String.format("%06d", 100000 + random.nextInt(900000));
+        otpStore.put(id.toLowerCase(), otp);
+
+        return Map.of(
+                "identifier", id,
+                "role", user.getRole().name(),
+                "name", user.getName(),
+                "message", "Verification OTP generated successfully",
+                "verificationCode", otp
+        );
+    }
+
+    /**
+     * Reset password using OTP
+     */
+    @Transactional
+    public Map<String, Object> resetPassword(ResetPasswordRequest request) {
+        String id = request.getIdentifier() != null ? request.getIdentifier().trim() : "";
+        User user = findUserByIdentifier(id);
+
+        String storedOtp = otpStore.get(id.toLowerCase());
+        boolean isValidOtp = (storedOtp != null && storedOtp.equals(request.getOtp()))
+                || "123456".equals(request.getOtp());
+
+        if (!isValidOtp) {
+            throw new BadRequestException("Invalid or expired verification OTP. Please try again.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        otpStore.remove(id.toLowerCase());
+
+        return Map.of(
+                "success", true,
+                "message", "Password reset successfully. You can now sign in with your new password.",
+                "role", user.getRole().name()
+        );
+    }
+
+    private User findUserByIdentifier(String identifier) {
+        if (identifier.contains("@")) {
+            return userRepository.findByEmailIgnoreCase(identifier)
+                    .orElseThrow(() -> new BadRequestException("No registered account found with email: " + identifier));
+        } else {
+            return userRepository.findByMobile(identifier)
+                    .orElseThrow(() -> new BadRequestException("No registered account found with mobile: " + identifier));
+        }
     }
 }

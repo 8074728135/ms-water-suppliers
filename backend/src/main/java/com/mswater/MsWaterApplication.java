@@ -20,9 +20,16 @@ public class MsWaterApplication {
             org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         return args -> {
             userRepository.findByMobile("9999999999").ifPresent(owner -> {
+                owner.setEmail("gowrish2006m@gmail.com");
+                owner.setName("Gowrish (Owner)");
                 owner.setPasswordHash(passwordEncoder.encode("admin123"));
                 userRepository.save(owner);
-                System.out.println(">>> Demo Owner password seeded: admin123");
+                System.out.println(">>> Owner seeded: gowrish2006m@gmail.com / 9999999999 (admin123)");
+            });
+            userRepository.findByEmailIgnoreCase("gowrish2006m@gmail.com").ifPresent(owner -> {
+                owner.setRole(com.mswater.user.entity.Role.OWNER);
+                owner.setIsActive(true);
+                userRepository.save(owner);
             });
             userRepository.findByMobile("8888888888").ifPresent(driver -> {
                 driver.setPasswordHash(passwordEncoder.encode("driver123"));

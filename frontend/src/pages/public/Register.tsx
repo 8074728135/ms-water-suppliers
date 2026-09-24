@@ -2,21 +2,22 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/auth.api';
-import toast from 'react-hot-toast';
-import { Droplets, User, Phone, Lock, Sparkles, ArrowRight } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { Droplets, Sparkles, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !mobile || !password || !confirmPassword) {
+    if (!name.trim() || !mobile.trim() || !password || !confirmPassword) {
       toast.error('Please fill in all fields');
       return;
     }
@@ -24,18 +25,23 @@ export default function Register() {
       toast.error('Passwords do not match');
       return;
     }
-    if (!/^[6-9]\d{9}$/.test(mobile)) {
-      toast.error('Please enter a valid 10-digit mobile number');
+    if (!/^[6-9]\d{9}$/.test(mobile.trim())) {
+      toast.error('Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9');
       return;
     }
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (password.length < 4) {
+      toast.error('Password must be at least 4 characters');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await authApi.register({ name, mobile, password });
+      const response = await authApi.register({
+        name: name.trim(),
+        mobile: mobile.trim(),
+        password,
+      });
+
       if (response.data.success) {
         login(response.data.data);
         toast.success('Account created successfully! Welcome to MS Water Suppliers. 💧');
@@ -53,10 +59,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50/60 via-slate-50 to-slate-100 text-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative Orbs */}
-      <div className="absolute w-[500px] h-[500px] rounded-full bg-sky-200/30 blur-3xl -top-20 -left-20 pointer-events-none" />
-      <div className="absolute w-[500px] h-[500px] rounded-full bg-blue-200/20 blur-3xl -bottom-20 -right-20 pointer-events-none" />
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/70 via-slate-50 to-slate-100 text-slate-900 flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+      <Toaster position="top-center" />
+      {/* Decorative Radial Orbs */}
+      <div className="absolute w-[600px] h-[600px] rounded-full bg-sky-200/35 blur-3xl -top-28 -left-28 pointer-events-none" />
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-blue-200/25 blur-3xl -bottom-28 -right-28 pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10 animate-fade-in my-auto">
         {/* Brand Header */}
@@ -80,108 +87,85 @@ export default function Register() {
         <div className="bg-white rounded-3xl p-7 sm:p-9 border border-slate-200 shadow-xl space-y-6">
           <div className="text-center space-y-1">
             <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Create Customer Account</h2>
-            <p className="text-xs sm:text-sm text-slate-500">Book water tankers in under 60 seconds</p>
+            <p className="text-xs sm:text-sm text-slate-500">Book water tankers & drums in under 60 seconds</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Full Name
+                Full Name *
               </label>
-              <div className="relative">
-                {!name && (
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
-                    <User className="w-4 h-4" />
-                  </div>
-                )}
-                <input
-                  id="register-name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ramesh Reddy"
-                  style={{ paddingLeft: !name ? '2.5rem' : '1rem' }}
-                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
-                  required
-                />
-              </div>
+              <input
+                id="register-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Ramesh Reddy"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                required
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Mobile Number
+                Mobile Number (10 Digits) *
               </label>
-              <div className="relative">
-                {!mobile && (
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                )}
-                <input
-                  id="register-mobile"
-                  type="tel"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                  placeholder="10-digit mobile number"
-                  maxLength={10}
-                  style={{ paddingLeft: !mobile ? '2.5rem' : '1rem' }}
-                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
-                  required
-                />
-              </div>
+              <input
+                id="register-mobile"
+                type="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+                placeholder="e.g. 9876543210"
+                maxLength={10}
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
+                required
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Create Password
+                Create Password *
               </label>
-              <div className="relative">
-                {!password && (
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                )}
+              <div className="relative flex items-center">
                 <input
                   id="register-password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
-                  style={{ paddingLeft: !password ? '2.5rem' : '1rem' }}
-                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                  placeholder="At least 4 characters"
+                  className="w-full pl-4 pr-11 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 text-slate-400 hover:text-slate-600 p-1"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Confirm Password
+                Confirm Password *
               </label>
-              <div className="relative">
-                {!confirmPassword && (
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-600 transition-opacity">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                )}
-                <input
-                  id="register-confirm"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  style={{ paddingLeft: !confirmPassword ? '2.5rem' : '1rem' }}
-                  className="w-full pr-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
-                  required
-                />
-              </div>
+              <input
+                id="register-confirm"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+                required
+              />
             </div>
 
             <button
               id="register-submit"
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-xl btn-primary text-sm font-bold shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full h-12 rounded-xl btn-primary text-sm font-bold shadow-md shadow-sky-500/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -198,11 +182,17 @@ export default function Register() {
             </button>
           </form>
 
-          <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-500 flex items-center justify-between">
-            <span>Already registered?</span>
-            <Link to="/login" className="font-bold text-sky-600 hover:text-sky-700 transition-colors">
-              Sign In →
-            </Link>
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span className="flex items-center gap-1.5 text-slate-600 font-medium">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              Verified Hindupur Supply
+            </span>
+            <div className="text-right">
+              <span>Already registered? </span>
+              <Link to="/login" className="font-bold text-sky-600 hover:text-sky-700 transition-colors">
+                Sign In →
+              </Link>
+            </div>
           </div>
         </div>
       </div>

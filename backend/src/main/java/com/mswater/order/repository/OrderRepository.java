@@ -18,7 +18,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByIdempotencyKey(String idempotencyKey);
 
-    List<Order> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items LEFT JOIN FETCH o.customer c LEFT JOIN FETCH c.user WHERE o.customer.id = :customerId ORDER BY o.createdAt DESC")
+    List<Order> findByCustomerIdOrderByCreatedAtDesc(@Param("customerId") Long customerId);
 
     @Query("SELECT o FROM Order o WHERE o.customer.id = :customerId AND o.status NOT IN ('DELIVERED', 'CANCELLED') ORDER BY o.createdAt DESC")
     List<Order> findActiveOrdersByCustomerId(@Param("customerId") Long customerId);
