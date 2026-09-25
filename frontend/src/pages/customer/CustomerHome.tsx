@@ -18,14 +18,17 @@ import {
   Zap,
   Star,
   Clock,
+  Phone,
   PhoneCall,
   Calendar,
   AlertCircle,
   Sparkles,
   ArrowRight,
   TrendingDown,
+  Edit2,
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import EditPhoneModal from '../../components/customer/EditPhoneModal';
 
 export default function CustomerHome() {
   const { user } = useAuth();
@@ -41,6 +44,9 @@ export default function CustomerHome() {
   // Quick feedback state
   const [ratedOrderId, setRatedOrderId] = useState<number | null>(null);
   const [ratingStars, setRatingStars] = useState<number>(5);
+
+  // Phone modal state
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -183,6 +189,38 @@ export default function CustomerHome() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Customer Delivery Phone Number Card */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+              <Phone className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 block">
+                Delivery Contact Phone Number
+              </span>
+              <div className="text-xl font-black font-mono text-slate-900 mt-0.5 flex items-center gap-2.5">
+                <span>+91 {profile?.mobile || user?.mobile || 'Not set'}</span>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                  ● Verified Active
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Tanker drivers call this phone number when approaching your street in Hindupur.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowPhoneModal(true)}
+            className="btn-primary text-xs h-11 px-5 font-bold flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-xs cursor-pointer"
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+            <span>{user?.mobile ? 'Change Phone Number' : 'Add Phone Number'}</span>
+          </button>
         </div>
 
         {/* Active Order Tracker (If any) */}
@@ -685,6 +723,13 @@ export default function CustomerHome() {
             </a>
           </div>
         </div>
+
+        {/* Edit Phone Modal */}
+        <EditPhoneModal
+          isOpen={showPhoneModal}
+          onClose={() => setShowPhoneModal(false)}
+          onSuccess={() => loadData()}
+        />
       </div>
     </CustomerLayout>
   );

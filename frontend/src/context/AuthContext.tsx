@@ -4,6 +4,7 @@ import type { AuthUser } from '../types';
 interface AuthContextType {
   user: AuthUser | null;
   login: (authData: AuthUser) => void;
+  updateUser: (updatedFields: Partial<AuthUser>) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isCustomer: boolean;
@@ -38,6 +39,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(authData));
   };
 
+  const updateUser = (updatedFields: Partial<AuthUser>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem(STORAGE_KEY);
@@ -46,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     login,
+    updateUser,
     logout,
     isAuthenticated: !!user,
     isCustomer: user?.role === 'CUSTOMER',

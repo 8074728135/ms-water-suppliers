@@ -179,7 +179,7 @@ export default function Login() {
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="e.g. 9876543210 or gowrish2006m@gmail.com"
+                  placeholder="Enter your mobile number or email"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   required
                 />
@@ -298,7 +298,7 @@ export default function Login() {
                     required
                     value={forgotIdentifier}
                     onChange={(e) => setForgotIdentifier(e.target.value)}
-                    placeholder="e.g. 9876543210 or gowrish2006m@gmail.com"
+                    placeholder="Enter registered mobile number or email"
                     className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                   />
                   <p className="text-[11px] text-slate-500 mt-1.5">

@@ -6,6 +6,9 @@ export const customerApi = {
   getProfile: () =>
     api.get<ApiResponse<CustomerProfile>>('/api/customers/profile'),
 
+  updateProfile: (data: { name?: string; mobile?: string; email?: string }) =>
+    api.put<ApiResponse<CustomerProfile>>('/api/customers/profile', data),
+
   getAddresses: () =>
     api.get<ApiResponse<Address[]>>('/api/customers/addresses'),
 

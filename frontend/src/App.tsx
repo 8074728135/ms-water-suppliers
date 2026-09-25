@@ -11,6 +11,7 @@ import CustomerHome from './pages/customer/CustomerHome';
 import OrderWater from './pages/customer/OrderWater';
 import MyOrders from './pages/customer/MyOrders';
 import MyAddresses from './pages/customer/MyAddresses';
+import CustomerProfile from './pages/customer/CustomerProfile';
 
 // Owner pages
 import OwnerDashboard from './pages/owner/OwnerDashboard';
@@ -79,6 +80,7 @@ export default function App() {
       <Route path="/customer/order" element={<ProtectedRoute allowedRoles={['CUSTOMER']}><OrderWater /></ProtectedRoute>} />
       <Route path="/customer/orders" element={<ProtectedRoute allowedRoles={['CUSTOMER']}><MyOrders /></ProtectedRoute>} />
       <Route path="/customer/addresses" element={<ProtectedRoute allowedRoles={['CUSTOMER']}><MyAddresses /></ProtectedRoute>} />
+      <Route path="/customer/profile" element={<ProtectedRoute allowedRoles={['CUSTOMER']}><CustomerProfile /></ProtectedRoute>} />
 
       {/* Owner Routes */}
       <Route path="/owner" element={<ProtectedRoute allowedRoles={['OWNER']}><OwnerDashboard /></ProtectedRoute>} />

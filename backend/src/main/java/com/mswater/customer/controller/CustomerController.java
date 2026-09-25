@@ -26,6 +26,7 @@ public class CustomerController {
 
     private final CustomerRepository customerRepository;
     private final CustomerAddressRepository addressRepository;
+    private final com.mswater.user.repository.UserRepository userRepository;
 
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getProfile(
@@ -45,6 +46,49 @@ public class CustomerController {
         );
 
         return ResponseEntity.ok(ApiResponse.success(profile));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateProfile(
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, String> body) {
+        Customer customer = customerRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "userId", user.getId()));
+
+        if (body.containsKey("name") && body.get("name") != null && !body.get("name").trim().isEmpty()) {
+            user.setName(body.get("name").trim());
+        }
+
+        if (body.containsKey("mobile") && body.get("mobile") != null && !body.get("mobile").trim().isEmpty()) {
+            String newMobile = body.get("mobile").trim().replaceAll("\\D", "");
+            if (newMobile.length() != 10) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Please enter a valid 10-digit mobile number"));
+            }
+            if (!newMobile.equals(user.getMobile()) && userRepository.existsByMobile(newMobile)) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("This phone number is already registered to another account"));
+            }
+            user.setMobile(newMobile);
+        }
+
+        if (body.containsKey("email") && body.get("email") != null) {
+            String email = body.get("email").trim();
+            user.setEmail(email.isEmpty() ? null : email);
+        }
+
+        userRepository.save(user);
+
+        Map<String, Object> profile = Map.of(
+                "id", customer.getId(),
+                "name", user.getName(),
+                "mobile", user.getMobile(),
+                "email", user.getEmail() != null ? user.getEmail() : "",
+                "totalOrders", customer.getTotalOrders(),
+                "totalSpent", customer.getTotalSpent(),
+                "outstandingAmount", customer.getOutstandingAmount(),
+                "memberSince", customer.getCreatedAt() != null ? customer.getCreatedAt().toString() : ""
+        );
+
+        return ResponseEntity.ok(ApiResponse.success("Phone number and profile updated successfully", profile));
     }
 
     // =================== ADDRESSES ===================

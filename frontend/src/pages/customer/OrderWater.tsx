@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { serviceApi, customerApi, orderApi } from '../../api';
 import type { WaterService, Address } from '../../types';
 import CustomerLayout from '../../components/layout/CustomerLayout';
+import EditPhoneModal from '../../components/customer/EditPhoneModal';
 import {
   MapPin,
   Plus,
@@ -10,12 +12,16 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
+  Phone,
+  Edit2,
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function OrderWater() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [services, setServices] = useState<WaterService[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
@@ -550,6 +556,31 @@ export default function OrderWater() {
               </div>
             </div>
 
+            {/* Delivery Contact Phone Number */}
+            <div className="p-4.5 bg-sky-50/80 border border-sky-200 rounded-2xl flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white text-sky-600 flex items-center justify-center shadow-xs shrink-0">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-bold text-slate-900 block">
+                    Driver Delivery Contact Phone
+                  </span>
+                  <span className="font-mono text-xs font-bold text-sky-800">
+                    +91 {user?.mobile || 'Not set'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPhoneModal(true)}
+                className="text-xs font-bold text-sky-700 hover:text-sky-900 underline flex items-center gap-1 cursor-pointer"
+              >
+                <Edit2 className="w-3 h-3" />
+                <span>{user?.mobile ? 'Change Number' : 'Add Number'}</span>
+              </button>
+            </div>
+
             {/* Special Instructions */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -595,6 +626,12 @@ export default function OrderWater() {
           </div>
         )}
       </div>
+
+      {/* Quick Edit Phone Modal */}
+      <EditPhoneModal
+        isOpen={showPhoneModal}
+        onClose={() => setShowPhoneModal(false)}
+      />
     </CustomerLayout>
   );
 }
