@@ -150,7 +150,7 @@ export default function ContactSection() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Suresh Reddy"
+                    placeholder="Enter your full name"
                     className="input-field text-sm h-13"
                   />
                 </div>
@@ -165,7 +165,7 @@ export default function ContactSection() {
                     maxLength={10}
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                    placeholder="e.g. 9876543210"
+                    placeholder="Enter 10-digit mobile number"
                     className="input-field text-sm h-13"
                   />
                 </div>
@@ -179,7 +179,7 @@ export default function ContactSection() {
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="e.g. Melapuram Ward 3, near Ramalayam temple. Need Full Tanker tomorrow morning."
+                  placeholder="Enter street address, landmark in Hindupur or water requirement"
                   className="input-field text-sm py-3.5 leading-relaxed"
                 />
               </div>

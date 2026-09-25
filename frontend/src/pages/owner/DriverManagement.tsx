@@ -385,7 +385,7 @@ export default function DriverManagement() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ramesh Reddy"
+                  placeholder="Enter driver full name"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
                 />
               </div>
@@ -400,7 +400,7 @@ export default function DriverManagement() {
                   maxLength={10}
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                  placeholder="e.g. 8888888888"
+                  placeholder="Enter 10-digit mobile number"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">
@@ -416,7 +416,7 @@ export default function DriverManagement() {
                   type="text"
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
-                  placeholder="e.g. AP 04 XX 1024"
+                  placeholder="Vehicle registration number (AP 04 XX 1234)"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
                 />
               </div>
@@ -430,7 +430,7 @@ export default function DriverManagement() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="e.g. driver123"
+                  placeholder="Set login password for driver"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">

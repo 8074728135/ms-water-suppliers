@@ -106,15 +106,15 @@ export default function CustomerProfile() {
                   <User className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Personal Information</h2>
-                  <p className="text-xs text-slate-500">Account identity</p>
+                  <h2 className="text-base font-bold text-slate-900">Customer Credentials & Phone Number</h2>
+                  <p className="text-xs text-slate-500">Account login username, phone, and password</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowEditModal(true)}
-                className="text-xs font-bold text-sky-600 hover:underline"
+                className="text-xs font-bold text-sky-600 hover:underline cursor-pointer"
               >
-                Edit
+                Edit Credentials & Phone
               </button>
             </div>
 
@@ -130,11 +130,36 @@ export default function CustomerProfile() {
 
               <div>
                 <span className="text-slate-400 font-medium block uppercase text-[10px] tracking-wider">
-                  Registered Mobile / Username
+                  Customer Credentials Phone Number (Login Username)
                 </span>
-                <span className="text-sm font-mono font-bold text-slate-900 mt-0.5 block">
-                  {profile?.mobile || user?.mobile}
+                <div className="flex items-center justify-between mt-0.5">
+                  <span className="text-sm font-mono font-bold text-slate-900">
+                    +91 {profile?.mobile || user?.mobile}
+                  </span>
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="text-[11px] font-bold text-sky-600 hover:text-sky-800 underline cursor-pointer"
+                  >
+                    Change Phone
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-slate-400 font-medium block uppercase text-[10px] tracking-wider">
+                  Password & Account Security
                 </span>
+                <div className="flex items-center justify-between mt-0.5">
+                  <span className="text-sm font-medium text-slate-700">
+                    •••••••• (Encrypted)
+                  </span>
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="text-[11px] font-bold text-sky-600 hover:text-sky-800 underline cursor-pointer"
+                  >
+                    Update Password
+                  </button>
+                </div>
               </div>
 
               <div>

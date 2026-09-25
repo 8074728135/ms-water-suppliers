@@ -27,6 +27,7 @@ public class CustomerController {
     private final CustomerRepository customerRepository;
     private final CustomerAddressRepository addressRepository;
     private final com.mswater.user.repository.UserRepository userRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getProfile(
@@ -73,6 +74,14 @@ public class CustomerController {
         if (body.containsKey("email") && body.get("email") != null) {
             String email = body.get("email").trim();
             user.setEmail(email.isEmpty() ? null : email);
+        }
+
+        if (body.containsKey("password") && body.get("password") != null && !body.get("password").trim().isEmpty()) {
+            String newPassword = body.get("password").trim();
+            if (newPassword.length() < 4) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Password must be at least 4 characters"));
+            }
+            user.setPasswordHash(passwordEncoder.encode(newPassword));
         }
 
         userRepository.save(user);

@@ -349,7 +349,7 @@ export default function OrderWater() {
                     type="text"
                     value={newLabel}
                     onChange={(e) => setNewLabel(e.target.value)}
-                    placeholder="e.g. Home, Shop, Construction Site"
+                    placeholder="Address label (Home, Shop, Construction)"
                     className="input-field text-xs h-9"
                   />
                 </div>
@@ -590,7 +590,7 @@ export default function OrderWater() {
                 type="text"
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
-                placeholder="e.g. Underground sump behind main gate"
+                placeholder="Underground sump location or driver delivery notes"
                 className="input-field text-xs h-11 px-3.5"
               />
             </div>

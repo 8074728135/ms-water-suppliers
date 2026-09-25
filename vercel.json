@@ -1,5 +1,6 @@
 {
-  "buildCommand": "node -e \"const fs=require('fs'),cp=require('child_process');if(fs.existsSync('frontend/package.json')){cp.execSync('cd frontend && npm install && npm run build',{stdio:'inherit'})}else{cp.execSync('npm run build',{stdio:'inherit'})}\"",
+  "buildCommand": "node -e \"const fs=require('fs'),cp=require('child_process');if(fs.existsSync('frontend/package.json')){cp.execSync('cd frontend && npm install && npm run build',{stdio:'inherit'});if(fs.existsSync('frontend/dist')){fs.cpSync('frontend/dist','dist',{recursive:true});}}else{cp.execSync('npm run build',{stdio:'inherit'})}\"",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/:match*",

@@ -5,6 +5,16 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import App from './App';
 import './index.css';
+// @ts-ignore
+import { registerSW } from 'virtual:pwa-register';
+
+// Register service worker with auto-update
+registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    window.location.reload();
+  },
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

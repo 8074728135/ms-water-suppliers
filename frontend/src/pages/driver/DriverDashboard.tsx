@@ -655,7 +655,7 @@ export default function DriverDashboard() {
                   type="text"
                   value={failNotes}
                   onChange={(e) => setFailNotes(e.target.value)}
-                  placeholder="e.g. Gate locked, called 3 times"
+                  placeholder="Reason for delivery issue (Gate locked, customer unavailable, etc.)"
                   className="input-field text-xs h-11 px-3.5"
                 />
               </div>
@@ -782,7 +782,7 @@ export default function DriverDashboard() {
                   type="text"
                   value={customLeaveReason}
                   onChange={(e) => setCustomLeaveReason(e.target.value)}
-                  placeholder="e.g. Back in town tomorrow afternoon"
+                  placeholder="Reason for leave request (personal, out of town, etc.)"
                   className="input-field text-xs sm:text-sm h-12 px-4"
                 />
               </div>

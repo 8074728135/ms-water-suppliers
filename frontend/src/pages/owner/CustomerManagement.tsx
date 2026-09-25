@@ -13,6 +13,9 @@ import {
   AlertCircle,
   FileText,
   X,
+  Edit2,
+  KeyRound,
+  ShieldCheck,
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -26,8 +29,17 @@ export default function CustomerManagement() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newName, setNewName] = useState('');
   const [newMobile, setNewMobile] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [newAddress, setNewAddress] = useState('');
   const [creating, setCreating] = useState(false);
+
+  // Modal for editing customer credentials & phone
+  const [editingCustomer, setEditingCustomer] = useState<CustomerProfile | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editMobile, setEditMobile] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editAddress, setEditAddress] = useState('');
+  const [savingCredentials, setSavingCredentials] = useState(false);
 
   useEffect(() => {
     loadCustomers();
@@ -49,7 +61,8 @@ export default function CustomerManagement() {
 
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMobile || newMobile.length < 10) {
+    const cleanMobile = newMobile.replace(/\D/g, '');
+    if (!cleanMobile || cleanMobile.length !== 10) {
       toast.error('Please enter a valid 10-digit mobile number');
       return;
     }
@@ -57,15 +70,17 @@ export default function CustomerManagement() {
     setCreating(true);
     try {
       const res = await adminApi.quickCreateCustomer({
-        name: newName.trim() || `Customer (${newMobile})`,
-        mobile: newMobile.trim(),
+        name: newName.trim() || `Customer (${cleanMobile})`,
+        mobile: cleanMobile,
+        password: newPassword.trim() || undefined,
         address: newAddress.trim() || 'Hindupur',
       });
       if (res.data.success) {
-        toast.success('Customer registered successfully');
+        toast.success('Customer registered with login credentials successfully');
         setIsAddModalOpen(false);
         setNewName('');
         setNewMobile('');
+        setNewPassword('');
         setNewAddress('');
         loadCustomers();
       }
@@ -73,6 +88,44 @@ export default function CustomerManagement() {
       toast.error(err.response?.data?.message || 'Failed to add customer');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const openEditModal = (c: CustomerProfile) => {
+    setEditingCustomer(c);
+    setEditName(c.name || '');
+    setEditMobile(c.mobile || '');
+    setEditPassword('');
+    setEditAddress('');
+  };
+
+  const handleSaveCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCustomer) return;
+    const cleanMobile = editMobile.replace(/\D/g, '');
+    if (!cleanMobile || cleanMobile.length !== 10) {
+      toast.error('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    setSavingCredentials(true);
+    try {
+      const res = await adminApi.updateCustomerCredentials(editingCustomer.id, {
+        name: editName.trim(),
+        mobile: cleanMobile,
+        password: editPassword.trim() || undefined,
+        address: editAddress.trim() || undefined,
+      });
+
+      if (res.data.success) {
+        toast.success('Customer phone number & credentials updated!');
+        setEditingCustomer(null);
+        loadCustomers();
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update customer credentials');
+    } finally {
+      setSavingCredentials(false);
     }
   };
 
@@ -274,12 +327,23 @@ export default function CustomerManagement() {
                         </span>
                       </td>
                       <td className="text-right">
-                        <Link
-                          to="/owner/orders/create"
-                          className="btn-secondary text-xs h-10 px-4.5 font-bold"
-                        >
-                          Book Order
-                        </Link>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(c)}
+                            className="btn-secondary text-xs h-9 px-3.5 font-bold flex items-center gap-1.5 cursor-pointer text-slate-700 hover:text-sky-700"
+                            title="Edit customer phone number & credentials"
+                          >
+                            <KeyRound className="w-3.5 h-3.5 text-sky-600" />
+                            <span>Credentials & Phone</span>
+                          </button>
+                          <Link
+                            to="/owner/orders/create"
+                            className="btn-primary text-xs h-9 px-3.5 font-bold"
+                          >
+                            Book Order
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -293,11 +357,14 @@ export default function CustomerManagement() {
       {/* Add Customer Modal with Generous 4-Sided Padding */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200 rounded-2xl p-8 sm:p-9 max-w-md w-full space-y-6 shadow-2xl">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-9 max-w-md w-full space-y-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-bold text-slate-900">
-                Register New Customer
-              </h3>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Register Customer & Set Credentials
+                </h3>
+                <p className="text-xs text-slate-500">Add phone number and credentials for customer</p>
+              </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
                 className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-100"
@@ -316,14 +383,14 @@ export default function CustomerManagement() {
                   required
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="e.g. Ramesh Reddy"
+                  placeholder="Enter customer full name"
                   className="input-field text-sm h-11 px-3.5"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                  Mobile Number (10 digits) *
+                  Mobile Number (Phone Number / Username) *
                 </label>
                 <input
                   type="tel"
@@ -331,9 +398,28 @@ export default function CustomerManagement() {
                   maxLength={10}
                   value={newMobile}
                   onChange={(e) => setNewMobile(e.target.value.replace(/\D/g, ''))}
-                  placeholder="e.g. 9876543210"
-                  className="input-field text-sm h-11 px-3.5"
+                  placeholder="Enter 10-digit mobile number"
+                  className="input-field text-sm h-11 px-3.5 font-mono"
                 />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Customer uses this phone number to sign into the portal and receive delivery calls.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Customer Login Password (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Default: mswater123"
+                  className="input-field text-sm h-11 px-3.5 font-mono"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Leave blank to set default initial password <span className="font-mono font-bold">mswater123</span>
+                </p>
               </div>
 
               <div>
@@ -353,16 +439,120 @@ export default function CustomerManagement() {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="btn-secondary text-xs h-11 px-5 font-bold"
+                  className="btn-secondary text-xs h-11 px-5 font-bold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="btn-primary text-xs h-11 px-6 font-bold"
+                  className="btn-primary text-xs h-11 px-6 font-bold cursor-pointer"
                 >
                   {creating ? 'Saving...' : 'Register Customer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Customer Phone & Credentials Modal */}
+      {editingCustomer && (
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-9 max-w-md w-full space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Customer Credentials & Phone
+                  </h3>
+                  <p className="text-xs text-slate-500">Update phone number or reset login credentials</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingCustomer(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCredentials} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Customer Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Customer full name"
+                  className="input-field text-sm h-11 px-3.5"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Phone Number (Customer Credentials Mobile) *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  maxLength={10}
+                  value={editMobile}
+                  onChange={(e) => setEditMobile(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Enter 10-digit mobile number"
+                  className="input-field text-sm h-11 px-3.5 font-mono font-bold"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Used by customer to sign in and called by drivers on delivery.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Reset Password (Leave blank to keep unchanged)
+                </label>
+                <input
+                  type="text"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  placeholder="Enter new password (optional)"
+                  className="input-field text-sm h-11 px-3.5 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Delivery Address
+                </label>
+                <input
+                  type="text"
+                  value={editAddress}
+                  onChange={(e) => setEditAddress(e.target.value)}
+                  placeholder="Update street / landmark in Hindupur"
+                  className="input-field text-sm h-11 px-3.5"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setEditingCustomer(null)}
+                  className="btn-secondary text-xs h-11 px-5 font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingCredentials}
+                  className="btn-primary text-xs h-11 px-6 font-bold cursor-pointer"
+                >
+                  {savingCredentials ? 'Saving...' : 'Update Phone & Credentials'}
                 </button>
               </div>
             </form>

@@ -66,17 +66,24 @@ public class AdminCustomerController {
         String mobile = body.get("mobile");
         String addressLine = body.getOrDefault("address", "Hindupur");
 
+        String password = body.getOrDefault("password", "mswater123");
+
         if (mobile == null || mobile.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Mobile number is required"));
         }
 
+        String cleanMobile = mobile.trim().replaceAll("\\D", "");
+        if (cleanMobile.length() != 10) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Please enter a valid 10-digit mobile number"));
+        }
+
         // Check if user exists
-        User user = userRepository.findByMobile(mobile.trim())
+        User user = userRepository.findByMobile(cleanMobile)
                 .orElseGet(() -> {
                     User newUser = User.builder()
                             .name(name)
-                            .mobile(mobile.trim())
-                            .passwordHash(passwordEncoder.encode("mswater123"))
+                            .mobile(cleanMobile)
+                            .passwordHash(passwordEncoder.encode(password.trim().isEmpty() ? "mswater123" : password.trim()))
                             .role(Role.CUSTOMER)
                             .isActive(true)
                             .build();
@@ -107,6 +114,82 @@ public class AdminCustomerController {
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(toMap(customer)));
+    }
+
+    @PutMapping("/{id}/credentials")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateCustomerCredentials(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
+        User user = customer.getUser();
+
+        if (body.containsKey("name") && body.get("name") != null && !body.get("name").trim().isEmpty()) {
+            user.setName(body.get("name").trim());
+        }
+
+        if (body.containsKey("mobile") && body.get("mobile") != null) {
+            String newMobile = body.get("mobile").trim().replaceAll("\\D", "");
+            if (newMobile.length() != 10) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Phone number must be exactly 10 digits"));
+            }
+            if (!newMobile.equals(user.getMobile())) {
+                if (userRepository.existsByMobile(newMobile)) {
+                    return ResponseEntity.badRequest().body(ApiResponse.error("Phone number is already registered to another account"));
+                }
+                user.setMobile(newMobile);
+            }
+        }
+
+        if (body.containsKey("email") && body.get("email") != null) {
+            String email = body.get("email").trim();
+            user.setEmail(email.isEmpty() ? null : email);
+        }
+
+        if (body.containsKey("password") && body.get("password") != null && !body.get("password").trim().isEmpty()) {
+            user.setPasswordHash(passwordEncoder.encode(body.get("password").trim()));
+        }
+
+        userRepository.save(user);
+
+        // Update default address if passed
+        if (body.containsKey("address") && body.get("address") != null && !body.get("address").trim().isEmpty()) {
+            List<CustomerAddress> addresses = addressRepository.findByCustomerId(customer.getId());
+            if (!addresses.isEmpty()) {
+                CustomerAddress addr = addresses.get(0);
+                addr.setAddressLine1(body.get("address").trim());
+                addressRepository.save(addr);
+            } else {
+                CustomerAddress address = CustomerAddress.builder()
+                        .customer(customer)
+                        .label("HOME")
+                        .addressLine1(body.get("address").trim())
+                        .city("Hindupur")
+                        .isDefault(true)
+                        .build();
+                addressRepository.save(address);
+            }
+        }
+
+        return ResponseEntity.ok(ApiResponse.success("Customer credentials updated successfully", toMap(customer)));
+    }
+
+    @PutMapping("/{id}/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetCustomerPassword(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
+        String newPassword = body.get("newPassword");
+        if (newPassword == null || newPassword.trim().length() < 4) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Password must be at least 4 characters"));
+        }
+
+        User user = customer.getUser();
+        user.setPasswordHash(passwordEncoder.encode(newPassword.trim()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(ApiResponse.success("Customer password has been reset successfully", null));
     }
 
     private Map<String, Object> toMap(Customer customer) {

@@ -6,7 +6,7 @@ export const customerApi = {
   getProfile: () =>
     api.get<ApiResponse<CustomerProfile>>('/api/customers/profile'),
 
-  updateProfile: (data: { name?: string; mobile?: string; email?: string }) =>
+  updateProfile: (data: { name?: string; mobile?: string; email?: string; password?: string }) =>
     api.put<ApiResponse<CustomerProfile>>('/api/customers/profile', data),
 
   getAddresses: () =>
@@ -78,8 +78,14 @@ export const adminApi = {
   searchCustomers: (query: string) =>
     api.get<ApiResponse<CustomerProfile[]>>('/api/admin/customers', { params: { q: query } }),
 
-  quickCreateCustomer: (data: { name: string; mobile: string; address?: string }) =>
+  quickCreateCustomer: (data: { name: string; mobile: string; address?: string; password?: string }) =>
     api.post<ApiResponse<CustomerProfile>>('/api/admin/customers/quick', data),
+
+  updateCustomerCredentials: (id: number, data: { name?: string; mobile?: string; email?: string; address?: string; password?: string }) =>
+    api.put<ApiResponse<CustomerProfile>>(`/api/admin/customers/${id}/credentials`, data),
+
+  resetCustomerPassword: (id: number, newPassword: string) =>
+    api.put<ApiResponse<void>>(`/api/admin/customers/${id}/reset-password`, { newPassword }),
 
   // Drivers
   getDrivers: () =>

@@ -15,6 +15,7 @@ export default function EditPhoneModal({ isOpen, onClose, onSuccess }: EditPhone
   const [mobile, setMobile] = useState(user?.mobile || '');
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -37,6 +38,7 @@ export default function EditPhoneModal({ isOpen, onClose, onSuccess }: EditPhone
         name: name.trim(),
         mobile: cleanMobile,
         email: email.trim() || undefined,
+        password: password.trim() || undefined,
       });
 
       if (res.data.success) {
@@ -44,7 +46,7 @@ export default function EditPhoneModal({ isOpen, onClose, onSuccess }: EditPhone
           name: name.trim(),
           mobile: cleanMobile,
         });
-        toast.success('Phone number & profile updated successfully! 💧');
+        toast.success('Customer phone number & credentials updated successfully! 💧');
         onSuccess?.(cleanMobile);
         onClose();
       }
@@ -65,8 +67,8 @@ export default function EditPhoneModal({ isOpen, onClose, onSuccess }: EditPhone
               <Phone className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Delivery Contact Number</h3>
-              <p className="text-xs text-slate-500">Tanker drivers will call this number on arrival</p>
+              <h3 className="text-lg font-bold text-slate-900">Customer Credentials & Phone</h3>
+              <p className="text-xs text-slate-500">Delivery contact number and account credentials</p>
             </div>
           </div>
           <button
@@ -94,7 +96,7 @@ export default function EditPhoneModal({ isOpen, onClose, onSuccess }: EditPhone
               />
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
-              Used for delivery coordination, driver call alerts, and account login.
+              Used for delivery coordination, driver call alerts, and portal sign-in.
             </p>
           </div>
 
@@ -109,6 +111,19 @@ export default function EditPhoneModal({ isOpen, onClose, onSuccess }: EditPhone
               onChange={(e) => setName(e.target.value)}
               placeholder="Your full name"
               className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              Update Password (Leave blank to keep unchanged)
+            </label>
+            <input
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter new password (optional)"
+              className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-100 transition-all font-mono"
             />
           </div>
 

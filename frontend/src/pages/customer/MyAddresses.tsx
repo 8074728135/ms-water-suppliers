@@ -214,7 +214,7 @@ export default function MyAddresses() {
                   required
                   value={form.addressLine1}
                   onChange={(e) => setForm({ ...form, addressLine1: e.target.value })}
-                  placeholder="e.g. Door No. 4/210, Near RTC Bus Stand"
+                  placeholder="Door number, street name, locality in Hindupur"
                   className="input-field text-xs h-11 px-3.5"
                 />
               </div>
@@ -227,7 +227,7 @@ export default function MyAddresses() {
                   type="text"
                   value={form.landmark}
                   onChange={(e) => setForm({ ...form, landmark: e.target.value })}
-                  placeholder="e.g. Opposite Venkateswara Temple"
+                  placeholder="Nearby landmark (temple, school, junction, etc.)"
                   className="input-field text-xs h-11 px-3.5"
                 />
               </div>

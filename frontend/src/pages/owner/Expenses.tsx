@@ -267,7 +267,7 @@ export default function Expenses() {
                   required
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  placeholder="e.g. 1500"
+                  placeholder="Enter expense amount in ₹"
                   className="input-field text-sm h-11 px-3.5 tabular-nums"
                 />
               </div>
@@ -281,7 +281,7 @@ export default function Expenses() {
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. 15L Diesel at Lepakshi Petrol Bunk"
+                  placeholder="Enter expense description (Diesel, Maintenance, etc.)"
                   className="input-field text-sm h-11 px-3.5"
                 />
               </div>
@@ -294,7 +294,7 @@ export default function Expenses() {
                   type="text"
                   value={vehicle}
                   onChange={(e) => setVehicle(e.target.value)}
-                  placeholder="e.g. Tanker 1"
+                  placeholder="Vehicle or tanker name"
                   className="input-field text-sm h-11 px-3.5"
                 />
               </div>

@@ -220,7 +220,7 @@ export default function CreatePhoneOrder() {
                       maxLength={10}
                       value={customerMobile}
                       onChange={(e) => setCustomerMobile(e.target.value.replace(/\D/g, ''))}
-                      placeholder="e.g. 9876543210"
+                      placeholder="Enter 10-digit mobile number"
                       className="input-field text-sm"
                     />
                     {searching && (
@@ -341,7 +341,7 @@ export default function CreatePhoneOrder() {
                   type="text"
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  placeholder="Street address, landmark, area (e.g. Near Market Road, Hindupur)"
+                  placeholder="Street address, landmark, area in Hindupur"
                   className="input-field text-sm h-12 px-4"
                 />
               </div>
@@ -403,7 +403,7 @@ export default function CreatePhoneOrder() {
                   type="text"
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
-                  placeholder="Special instructions (e.g. Tank on 2nd floor, call on arrival)"
+                  placeholder="Special delivery instructions for driver"
                   className="input-field text-sm h-11 px-4"
                 />
               </div>
